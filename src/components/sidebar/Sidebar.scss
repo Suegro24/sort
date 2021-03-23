@@ -1,0 +1,44 @@
+@import '../../scss/variables.scss';
+
+.sidebar {
+    position: relative;
+    left: 0;
+    top: 0;
+    height: calc(100vh - #{$header-height});
+    width: $sidebar-width;
+    border-right: 2px solid black;
+    background-color: $color-secondary;
+
+    &__list-title {
+        background-color: $color-secondary;
+        padding: 5px;
+        font-weight: 300;
+    }
+
+    & > * {
+        text-align: center;
+        color: $text-white;
+    }
+}
+
+.sidebar__list-item {
+    &--nested {
+        margin-top: 5px;
+        padding: 10px 0;
+        cursor: pointer;
+        font-size: 1.125rem;
+
+        &:hover {
+            background-color: $color-secondary-alternative;
+        }
+
+        &:first-child {
+            margin-top: 0;
+        }
+    }
+
+    &--active {
+        color: $color-primary;
+        background-color: $color-secondary-alternative;
+    }
+}

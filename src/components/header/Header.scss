@@ -1,0 +1,16 @@
+@import '../../scss/variables.scss';
+
+.header {
+    display: grid;
+    align-content: center;
+    width: 100vw;
+    height: $header-height;
+    background-color: $color-secondary-alternative;
+    color: $text-white;
+    position: absolute;
+    top: 0;
+
+    &__title {
+        text-align: center;
+    }
+}

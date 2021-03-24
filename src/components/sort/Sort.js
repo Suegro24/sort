@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 
 import './Sort.scss'
 
@@ -11,7 +11,7 @@ export const Sort = () => {
     const [numbers, setNumbers] = useContext(SortNumbersContext);
     const [sortingMethod] = useContext(SortingMethodContext);
     const [shouldStartSorting, setShouldStartSorting] = useContext(ShouldStartSortingContext);
-    const numbersRef = useRef(numbers);
+    const [render, setRender] = useState(false);
 
     const timeout = (delay) => {
         return new Promise(res => setTimeout(res, delay));
@@ -21,7 +21,7 @@ export const Sort = () => {
         for (let id of itemsId) {
             document.querySelectorAll('.sort-item')[id].classList.add('sort-item--highlight');
         }
-        await timeout(100);
+        await timeout(100)
         for (let id of itemsId) {
             document.querySelectorAll('.sort-item')[id].classList.remove('sort-item--highlight');
         }
@@ -43,12 +43,12 @@ export const Sort = () => {
     const bubbleSort = async() => {
         for (let i = 0; i < numbers.length; i++) {
             for (let j = 0; j < numbers.length - (i + 1); j++) {
-                await highlightItem(j, j + 1)
+                await highlightItem(j, j + 1);
                 if (numbers[j].number > numbers[j + 1].number) {
                     swapNumbers(j, j + 1);
-                    numbersRef.current = numbers;
-                    setNumbers(numbersRef.current);
+                    setNumbers(numbers);
                 }
+                setRender(prevRender => !prevRender);
             }
             markAsDoneItem(numbers.length - (i + 1));
         }
@@ -85,6 +85,7 @@ export const Sort = () => {
                     break;
                 }
             }
+            setRender(prevRender => !prevRender);
             setNumbers(numbers);
         }
     }
@@ -123,18 +124,22 @@ export const Sort = () => {
         )
     }
 
+    const quickSort = () => {
+
+    }
+
     const startSorting = () => {
         switch (sortingMethod) {
             case 'bubbleSort': {
-                bubbleSort()
+                bubbleSort();
                 break;
             }
             case 'selectionSort': {
-                selectionSort()
+                selectionSort();
                 break;
             }
             case 'insertionSort': {
-                insertionSort()
+                insertionSort();
                 break;
             }
             case 'mergeSort': {
@@ -143,6 +148,10 @@ export const Sort = () => {
                 })
                 // console.log(mergeSort(numbers));
                 // console.log(numbers);
+                break;
+            }
+            case 'quickSort': {
+                quickSort();
                 break;
             }
             default: {
@@ -156,7 +165,7 @@ export const Sort = () => {
         if (shouldStartSorting) {
             startSorting()
         }
-    }, [numbers, shouldStartSorting])
+    }, [shouldStartSorting, render])
 
     return (
         <main className="sort-container">

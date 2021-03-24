@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useRef } from 'react'
 
 import './Sort.scss'
 
@@ -10,7 +10,8 @@ export const Sort = () => {
 
     const [numbers, setNumbers] = useContext(SortNumbersContext);
     const [sortingMethod] = useContext(SortingMethodContext);
-    const [shouldStartSorting] = useContext(ShouldStartSortingContext);
+    const [shouldStartSorting, setShouldStartSorting] = useContext(ShouldStartSortingContext);
+    const numbersRef = useRef(numbers);
 
     const timeout = (delay) => {
         return new Promise(res => setTimeout(res, delay));
@@ -21,29 +22,105 @@ export const Sort = () => {
             document.querySelectorAll('.sort-item')[id].classList.add('sort-item--highlight');
         }
         await timeout(100);
-    }
-
-    const unHighlightItem = async (...itemsId) => {
-        await timeout(100);
         for (let id of itemsId) {
             document.querySelectorAll('.sort-item')[id].classList.remove('sort-item--highlight');
         }
     }
 
-    const bubbleSort = async () => {
+    const markAsDoneItem = (...itemsId) => {
+        for (let id of itemsId) {
+            document.querySelectorAll('.sort-item')[id].classList.add('sort-item--completed');
+        }
+    }
+
+    const swapNumbers = (index1, index2) => {
+        const temp = numbers[index1];
+        numbers[index1] = numbers[index2];
+        numbers[index2] = temp;
+        setNumbers(numbers);
+    }
+
+    const bubbleSort = async() => {
         for (let i = 0; i < numbers.length; i++) {
             for (let j = 0; j < numbers.length - (i + 1); j++) {
                 await highlightItem(j, j + 1)
                 if (numbers[j].number > numbers[j + 1].number) {
-                    const temp = numbers[j].number;
-                    numbers[j].number = numbers[j + 1].number;
-                    numbers[j + 1].number = temp;
-                    setNumbers(numbers);
+                    swapNumbers(j, j + 1);
+                    numbersRef.current = numbers;
+                    setNumbers(numbersRef.current);
                 }
-                await unHighlightItem(j, j + 1);
             }
+            markAsDoneItem(numbers.length - (i + 1));
         }
-        console.log(numbers);
+    }
+
+    const selectionSort = async() => {
+        for (let i = 0; i < numbers.length; i++) {
+            let minimum = {
+                value: numbers[i].number,
+                index: i
+            }
+            for (let j = (i + 1); j < numbers.length; j++) {
+                await highlightItem(minimum.index, j)
+                if (minimum.value > numbers[j].number) {
+                    minimum.value = numbers[j].number;
+                    minimum.index = j;
+                }
+            }
+            if (i !== minimum.index) {
+                swapNumbers(i, minimum.index);
+            }
+            markAsDoneItem(i);
+        }
+    }
+
+    const insertionSort = async() => {
+        for (let i = 1; i < numbers.length; i++) {
+            for (let j = 0; j < i; j++) {
+                await highlightItem(i, j);
+                if (numbers[i].number < numbers[j].number) {
+                    const temp = numbers[i];
+                    numbers.splice(i, 1);
+                    numbers.splice(j, 0, temp);
+                    break;
+                }
+            }
+            setNumbers(numbers);
+        }
+    }
+
+    const mergeSort = async (array) => {
+        if (array.length <= 1) {
+            return array;
+        }
+
+        const merge = async (leftArr, rightArr) => {
+            const result = [];
+            let leftIndex = 0;
+            let rightIndex = 0;
+
+            while (leftIndex < leftArr.length && rightIndex < rightArr.length) {
+                await highlightItem(leftIndex, leftArr.length + rightIndex);
+                if (leftArr[leftIndex].number < rightArr[rightIndex].number) {
+                    result.push(leftArr[leftIndex]);
+                    leftIndex++;
+                } else {
+                    result.push(rightArr[rightIndex]);
+                    rightIndex++;
+                }
+            }
+
+            return [...result, ...leftArr.slice(leftIndex), ...rightArr.slice(rightIndex)];
+        }
+
+        const middleIndex = Math.floor(array.length / 2);
+        const leftArr = array.slice(0, middleIndex);
+        const rightArr = array.slice(middleIndex);
+
+        return await merge(
+            await mergeSort(leftArr),
+            await mergeSort(rightArr)
+        )
     }
 
     const startSorting = () => {
@@ -52,18 +129,34 @@ export const Sort = () => {
                 bubbleSort()
                 break;
             }
+            case 'selectionSort': {
+                selectionSort()
+                break;
+            }
+            case 'insertionSort': {
+                insertionSort()
+                break;
+            }
+            case 'mergeSort': {
+                mergeSort(numbers).then((res) => {
+                    setNumbers(res);
+                })
+                // console.log(mergeSort(numbers));
+                // console.log(numbers);
+                break;
+            }
             default: {
                 throw new Error('Unknown sorting method: ' + sortingMethod)
             }
         }
-        
+        setShouldStartSorting(false);
     }
 
     useEffect(() => {
         if (shouldStartSorting) {
             startSorting()
         }
-    }, [shouldStartSorting, numbers])
+    }, [numbers, shouldStartSorting])
 
     return (
         <main className="sort-container">

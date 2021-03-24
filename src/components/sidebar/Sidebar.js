@@ -27,6 +27,13 @@ export const Sidebar = () => {
 
     const changeSortingMethod = (method) => {
         setSortingMethod(method);
+        const methodList = document.querySelector('#sidebarListSortingMethod');
+        const methodListItems = methodList.querySelectorAll('.sidebar__list-item--nested');
+        methodListItems.forEach(item => {
+            item.classList.remove('sidebar__list-item--active');
+            return null;
+        })
+        document.querySelector(`#${method}`).classList.add('sidebar__list-item--active');
     }
 
     const startSorting = () => {
@@ -44,8 +51,12 @@ export const Sidebar = () => {
                 </li>
                 <li className="sidebar__list-item">
                     <h2 className="sidebar__list-title">Sorting method</h2>
-                    <ul className="sidebar__list--nested">
-                        <li className="sidebar__list-item--nested sidebar__list-item--active" onClick={changeSortingMethod.bind('bubbleSort')}>Bubble sort</li>
+                    <ul id="sidebarListSortingMethod" className="sidebar__list--nested">
+                        <li id="bubbleSort" className="sidebar__list-item--nested sidebar__list-item--active" onClick={changeSortingMethod.bind(null, 'bubbleSort')}>Bubble sort</li>
+                        <li id="selectionSort" className="sidebar__list-item--nested" onClick={changeSortingMethod.bind(null, 'selectionSort')}>Selection sort</li>
+                        <li id="insertionSort" className="sidebar__list-item--nested" onClick={changeSortingMethod.bind(null, 'insertionSort')}>Insertion sort</li>
+                        <li id="mergeSort" className="sidebar__list-item--nested" onClick={changeSortingMethod.bind(null, 'mergeSort')}>Merge sort</li>
+                        <li id="quickSort" className="sidebar__list-item--nested" onClick={changeSortingMethod.bind(null, 'quickSort')}>Quick sort</li>
                     </ul>
                 </li>
                 <li className="sidebar__list-item">

@@ -11,6 +11,10 @@
     &--highlight {
         animation: highlightItem 2s infinite;
     }
+
+    &--completed {
+        background-color: green;
+    }
 }
 
 @keyframes highlightItem {
